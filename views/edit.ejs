@@ -1,0 +1,21 @@
+<% layout('layout') -%>
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/">Home</a></li>
+    <li class="breadcrumb-item"><a href="/<%= modelName %>/list"><%= schema.display.name %>s</a></li>
+    <li class="breadcrumb-item active" aria-current="page"><%= item ? 'Edit' : 'New' %></li>
+  </ol>
+</nav>
+
+<h1><%= item ? 'Edit' : 'New' %> <%= schema.display.name %></h1>
+
+<div class="sw-build-form" data-sw-model="<%= modelName %>" data-sw-pk="<%= item ? item[schema.pk] : '' %>" data-sw-mode="form">
+  <!-- Replaced by generated form. -->
+  <div class="alert alert-info">Loading form...</div>
+</div>
+
+<script>
+  app.model.ready(function(){
+    app.render.build('[data-sw-model="<%= modelName %>"]');
+  });
+</script>

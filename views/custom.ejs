@@ -1,0 +1,71 @@
+<% layout('layout') -%>
+<div class="p-5 mb-4 bg-body-tertiary rounded-3 border">
+  <h1 class="display-6">Custom Dashboard</h1>
+  <p class="lead">This page demonstrates the escape hatch. It is a normal EJS template with normal jQuery. Nothing here is auto-generated, but it can still talk to the auto-generated API.</p>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">Model counts</div>
+      <div class="card-body">
+        <ul id="model-counts" class="list-group">
+          <li class="list-group-item" jq-repeat="counts" jq-index-key="name">
+            <strong>{{name}}</strong>: {{count}}
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">Live events</div>
+      <div class="card-body">
+        <ul id="event-log" class="list-group">
+          <li class="list-group-item" jq-repeat="events" jq-index-key="id">
+            <span class="badge text-bg-secondary">{{model}}</span>
+            {{action}} — {{pk}}
+            <small class="text-muted">{{time}}</small>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  app.custom.register('dashboard', function(){
+    setTimeout(function(){
+      const counts = $.scope.counts;
+      const events = $.scope.events;
+
+      function loadCounts(){
+        app.api.get('/api/').done(function(resp){
+          counts.replace([]);
+          resp.models.forEach(function(model){
+            app.api.get(model.path).done(function(r){
+              counts.push({name: model.name, count: r.results.length});
+            });
+          });
+        });
+      }
+
+      app.sync.onAny(function(data){
+        events.unshift({
+          id: data.model + ':' + data.pk + ':' + Date.now(),
+          model: data.model,
+          action: data.action,
+          pk: data.pk,
+          time: new Date().toLocaleTimeString(),
+        });
+        if (events.length > 20) events.pop();
+        loadCounts();
+      });
+
+      loadCounts();
+    }, 0);
+  });
+
+  $(function(){ app.custom.run('dashboard'); });
+</script>

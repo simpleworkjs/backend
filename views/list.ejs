@@ -1,0 +1,23 @@
+<% layout('layout') -%>
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1><%= schema.display.name %>s</h1>
+  <a class="btn btn-success" href="/<%= modelName %>/new">+ New <%= schema.display.name %></a>
+</div>
+
+<div class="sw-build-table" data-sw-model="<%= modelName %>" data-sw-mode="table">
+  <!-- This placeholder is replaced by app.render.js with a generated table. -->
+  <div class="alert alert-info">Loading <%= schema.display.name %> table...</div>
+</div>
+
+<div class="mt-4">
+  <h4>Live cards</h4>
+  <div class="sw-build-card" data-sw-model="<%= modelName %>" data-sw-mode="card">
+    <!-- Replaced by generated cards. -->
+  </div>
+</div>
+
+<script>
+  app.model.ready(function(){
+    app.render.build('[data-sw-model="<%= modelName %>"]');
+  });
+</script>

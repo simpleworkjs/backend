@@ -1,0 +1,28 @@
+<% layout('layout') -%>
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/">Home</a></li>
+    <li class="breadcrumb-item"><a href="/<%= modelName %>/list"><%= schema.display.name %>s</a></li>
+    <li class="breadcrumb-item active" aria-current="page"><%= item[schema.display.titleField] %></li>
+  </ol>
+</nav>
+
+<div class="card">
+  <div class="card-body">
+    <h2 class="card-title"><%= item[schema.display.titleField] %></h2>
+    <% Object.keys(schema.fields).forEach(function(key){ %>
+      <% const field = schema.fields[key]; %>
+      <% if (field.isPrivate) return; %>
+      <div class="mb-2">
+        <strong><%= field.display.name || field.name %>:</strong>
+        <% if (field.references) { %>
+          <a href="/<%= field.references.model %>/<%= item[field.foreignKey] %>"><%= item[field.foreignKey] %></a>
+        <% } else { %>
+          <%= item[key] %>
+        <% } %>
+      </div>
+    <% }) %>
+    <a class="btn btn-primary" href="/<%= modelName %>/<%= item[schema.pk] %>/edit">Edit</a>
+    <a class="btn btn-outline-secondary" href="/<%= modelName %>/list">Back to list</a>
+  </div>
+</div>

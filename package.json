@@ -1,0 +1,49 @@
+{
+  "name": "@simpleworkjs/backend",
+  "version": "0.1.0",
+  "description": "Server framework for SimpleWorkJS apps with auto REST API, live sync, RBAC, and a project generator.",
+  "main": "index.js",
+  "bin": {
+    "simpleworks": "./cli.js"
+  },
+  "scripts": {
+    "test": "node --test test/**/*.test.js"
+  },
+  "keywords": [
+    "framework",
+    "crud",
+    "admin",
+    "internal-tools",
+    "homelab",
+    "devops",
+    "simpleworkjs"
+  ],
+  "author": "William Mantly",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wmantly/backend.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wmantly/backend/issues"
+  },
+  "homepage": "https://github.com/wmantly/backend#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@simpleworkjs/orm-identity": "file:../orm-identity",
+    "cookie-parser": "^1.4.6",
+    "ejs": "^3.1.9",
+    "ejs-mate": "^4.0.0",
+    "express": "^4.18.2",
+    "jquery": "^3.7.1",
+    "jq-repeat": "file:../../wmantly/jq-repeat",
+    "mustache": "^4.2.0",
+    "socket.io": "^4.7.4"
+  },
+  "devDependencies": {
+    "@simpleworkjs/conf": "file:../conf",
+    "socket.io-client": "^4.7.4"
+  }
+}

@@ -1,0 +1,24 @@
+<% layout('layout') -%>
+<div class="p-5 mb-4 bg-body-tertiary rounded-3 border">
+  <div class="container-fluid py-5">
+    <h1 class="display-5 fw-bold">SimpleWorkJS Beta</h1>
+    <p class="col-md-8 fs-4">
+      A slim, model-first framework for internal apps, homelab tools, and devops dashboards.
+      Define a model, get a working app with forms, tables, cards, REST API, and live sync.
+    </p>
+    <a class="btn btn-primary btn-lg" href="/Task/list" role="button">See Tasks</a>
+    <a class="btn btn-outline-secondary btn-lg" href="/custom/dashboard" role="button">Custom Dashboard</a>
+  </div>
+</div>
+
+<div class="row align-items-md-stretch">
+  <% models.forEach(function(model){ %>
+    <div class="col-md-4 mb-3">
+      <div class="h-100 p-5 bg-body-tertiary border rounded-3">
+        <h2><%= model.display.name %></h2>
+        <p>Auto-generated CRUD for the <%= model.name %> model.</p>
+        <a class="btn btn-outline-primary" href="/<%= model.name %>/list">Open <%= model.display.name %>s</a>
+      </div>
+    </div>
+  <% }) %>
+</div>
