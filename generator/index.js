@@ -225,7 +225,7 @@ conf/secrets.js
 function readmeMd(projectName) {
   return `# ${projectName}
 
-Generated with [SimpleWorkJS](https://github.com/wmantly/backend).
+Generated with [SimpleWorkJS](https://github.com/simpleworkjs/backend).
 
 ## Quick start
 

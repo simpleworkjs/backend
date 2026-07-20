@@ -9,12 +9,15 @@ Server framework for SimpleWorkJS apps. Combines Express, Socket.IO, EJS, and th
 - WebSocket live sync for model changes.
 - Built-in login/logout and RBAC permission middleware.
 - `npx simpleworks generate` CLI to scaffold new projects.
+- See the [`demo-todo`](https://github.com/simpleworkjs/demo-todo) repo for a complete golden-path starter.
 
 ## Install
 
 ```bash
 npm install @simpleworkjs/backend
 ```
+
+For a full working starter, clone the [`demo-todo`](https://github.com/simpleworkjs/demo-todo) repository.
 
 ## Usage
 
