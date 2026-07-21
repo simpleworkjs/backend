@@ -101,6 +101,15 @@ if [ "$HOME_STATUS" != "200" ]; then
 fi
 
 echo ""
+echo "==> Verifying frontend assets are served..."
+JS_STATUS=$(curl -s --max-time 5 -o /dev/null -w '%{http_code}' "${BASE_URL}/lib/js/app.js" || true)
+if [ "$JS_STATUS" != "200" ]; then
+  echo "ERROR: /lib/js/app.js returned HTTP ${JS_STATUS:-'(no response)'} (expected 200)"
+  cat server.log
+  exit 1
+fi
+
+echo ""
 echo "==> Logging in as seeded admin..."
 LOGIN_STATUS=$(curl -s --max-time 5 -c /tmp/swj-cookies.txt -o /tmp/swj-login-body.txt -w '%{http_code}' \
   -X POST "${BASE_URL}/login" \

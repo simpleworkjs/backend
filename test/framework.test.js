@@ -2,6 +2,8 @@
 
 const test = require('node:test');
 const assert = require('node:assert');
+const path = require('path');
+const fs = require('fs');
 const backend = require('..');
 const {Model} = require('@simpleworkjs/orm-identity');
 
@@ -125,6 +127,35 @@ test('seed function creates admin user and login works', async function() {
   }
 });
 
+test('frontend assets are served from @simpleworkjs/frontend', async function() {
+  const app = backend({conf: makeConf(), models: [Task]});
+  await app.init();
+  const server = app.http;
+
+  await new Promise(function(resolve, reject) {
+    server.listen(0, function(err) {
+      if (err) return reject(err);
+      resolve();
+    });
+  });
+
+  try {
+    const port = server.address().port;
+    const base = `http://localhost:${port}`;
+    const frontend = require('@simpleworkjs/frontend');
+
+    for (const [name, assetPath] of Object.entries(frontend.assets)) {
+      const expected = require('fs').readFileSync(assetPath, 'utf8');
+      const res = await fetch(`${base}/lib/js/${path.basename(assetPath)}`);
+      assert.strictEqual(res.status, 200, `${name} asset returns 200`);
+      const body = await res.text();
+      assert.strictEqual(body.trim(), expected.trim(), `${name} asset matches @simpleworkjs/frontend`);
+    }
+  } finally {
+    server.close();
+  }
+});
+
 test('generator creates expected files', async function() {
   const fs = require('fs');
   const path = require('path');
@@ -141,5 +172,5 @@ test('generator creates expected files', async function() {
   assert.ok(fs.existsSync(path.join(target, 'models', 'Task.js')), 'Task model created');
   assert.ok(fs.existsSync(path.join(target, 'conf', 'base.js')), 'conf/base.js created');
   assert.ok(fs.existsSync(path.join(target, 'views', 'layout.ejs')), 'views copied');
-  assert.ok(fs.existsSync(path.join(target, 'public', 'lib', 'js', 'app.js')), 'public assets copied');
+  assert.ok(fs.existsSync(path.join(target, 'public', 'lib', 'js', 'jq-repeat.js')), 'jq-repeat asset copied');
 });
