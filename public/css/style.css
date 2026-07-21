@@ -1,0 +1,32 @@
+/* SimpleWorkJS default styles */
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
+
+.sw-build-table .table th,
+.sw-build-table .table td {
+  vertical-align: middle;
+}
+
+.sw-card {
+  transition: transform 0.1s ease;
+}
+
+.sw-card:hover {
+  transform: translateY(-2px);
+}
+
+.actionMessage {
+  display: none;
+}
+
+.toast-container {
+  z-index: 1080;
+}

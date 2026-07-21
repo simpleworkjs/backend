@@ -1,11 +1,11 @@
 /* SimpleWorkJS frontend base.
  *
  * Exposes:
- *   app.api      — jQuery AJAX wrapper
- *   app.pubsub   — in-browser pub/sub bus
- *   app.socket   — Socket.IO client
- *   app.util     — small utilities
- *   app.ready    — queue callbacks after DOM + socket are ready
+ *   app.api       — jQuery AJAX wrapper
+ *   app.pubsub    — in-browser pub/sub bus
+ *   app.socket    — Socket.IO client
+ *   app.util      — small utilities
+ *   app.ready     — queue callbacks after DOM + socket are ready
  */
 
 (function($){
@@ -76,11 +76,13 @@
   };
 
   $(function(){
-    app.socket = io();
-    app.socket.on('model:event', function(data){
-      app.pubsub.publish('model:' + data.model + ':' + data.action, data);
-      app.pubsub.publish('model:any', data);
-    });
+    if (typeof io !== 'undefined') {
+      app.socket = io();
+      app.socket.on('model:event', function(data){
+        app.pubsub.publish('model:' + data.model + ':' + data.action, data);
+        app.pubsub.publish('model:any', data);
+      });
+    }
 
     app.isReady = true;
     app.onReady.forEach(function(cb){ cb(); });

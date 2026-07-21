@@ -64,11 +64,17 @@
       });
 
       // Delete handler.
-      $el.on('click', '.sw-delete', function(){
+      $el.on('click', '.sw-delete', async function(){
         const pk = $(this).data('pk');
-        if (confirm('Delete this record?')){
-          app.model.remove(modelName, pk);
-        }
+        const ok = await app.messages.confirm('Delete this record?', $el, 'danger');
+        if (!ok) return;
+
+        app.model.remove(modelName, pk).done(function(){
+          app.messages.toast('Record deleted.', 'success');
+        }).fail(function(xhr){
+          const resp = xhr.responseJSON || {};
+          app.messages.toast('Delete failed: ' + (resp.error && resp.error.message ? resp.error.message : xhr.statusText), 'danger');
+        });
       });
     },
 
@@ -189,10 +195,12 @@
           : app.model.update(modelName, pk, data);
 
         promise.done(function(){
+          app.messages.toast('Saved successfully.', 'success');
           window.location.href = '/' + modelName + '/list';
         }).fail(function(xhr){
           const resp = xhr.responseJSON || {};
-          alert('Save failed: ' + (resp.error && resp.error.message ? resp.error.message : xhr.statusText));
+          const msg = 'Save failed: ' + (resp.error && resp.error.message ? resp.error.message : xhr.statusText);
+          app.messages.toast(msg, 'danger');
         });
       });
     }

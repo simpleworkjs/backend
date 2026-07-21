@@ -66,6 +66,12 @@ router.post('/logout', async function(req, res) {
 router.get('/:model/list', async function(req, res, next) {
   const Model = router.models[req.params.model];
   if (!Model) return next();
+  if (!Model.hasPermission(req.user, 'read')) {
+    return res.status(req.user ? 403 : 401).render('error', {
+      title: 'Error',
+      message: req.user ? 'Permission denied' : 'Authentication required',
+    });
+  }
 
   const items = await Model.list();
   res.render('list', {
@@ -81,6 +87,7 @@ router.get('/:model/new', async function(req, res, next) {
   if (!Model) return next();
   if (!Model.hasPermission(req.user, 'create')) {
     return res.status(req.user ? 403 : 401).render('error', {
+      title: 'Error',
       message: req.user ? 'Permission denied' : 'Authentication required',
     });
   }
@@ -98,7 +105,10 @@ router.get('/:model/:pk/edit', async function(req, res, next) {
   if (!Model) return next();
 
   const item = await Model.get(req.params.pk);
-  if (!item) return res.status(404).render('error', {message: `${Model.name} not found`});
+  if (!item) return res.status(404).render('error', {
+    title: 'Error',
+    message: `${Model.name} not found`,
+  });
   if (!item.hasPermission(req.user, 'update')) {
     return res.status(req.user ? 403 : 401).render('error', {
       message: req.user ? 'Permission denied' : 'Authentication required',
@@ -118,7 +128,10 @@ router.get('/:model/:pk', async function(req, res, next) {
   if (!Model) return next();
 
   const item = await Model.get(req.params.pk);
-  if (!item) return res.status(404).render('error', {message: `${Model.name} not found`});
+  if (!item) return res.status(404).render('error', {
+    title: 'Error',
+    message: `${Model.name} not found`,
+  });
   if (!item.hasPermission(req.user, 'read')) {
     return res.status(req.user ? 403 : 401).render('error', {
       message: req.user ? 'Permission denied' : 'Authentication required',
