@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.2.1
+
+### Added
+
+- **Exposed methods** (`lib/modelRoute.js`): a model's `static exposedMethods`
+  (see `@simpleworkjs/orm`) are now mounted as REST endpoints. Instance methods
+  mount under `/:pk` and are gated by instance-level permission (so `owner`
+  applies to the loaded record); static/class methods mount at the model root
+  and are gated by model-level permission. Arguments are pulled from the body,
+  route params, or query per the method's `args` config; handlers respond with
+  `{data: <return value>}`. Mounted before the generic `/:pk` routes so a static
+  route (e.g. `GET /search`) isn't shadowed. Exposed methods are advertised in
+  the `OPTIONS` response under `paths.methods`.
+
 ## 0.2.0
 
 ### Changed

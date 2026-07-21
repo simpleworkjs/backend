@@ -1,6 +1,6 @@
 {
   "name": "@simpleworkjs/backend",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Server framework for SimpleWorkJS apps with auto REST API, live sync, RBAC, and a project generator.",
   "main": "index.js",
   "bin": {

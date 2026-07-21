@@ -230,6 +230,67 @@ The `OPTIONS` endpoint returns the metadata the frontend uses to build tables an
 
 This is exactly `Model.toSchema()` (which returns `{name, pk, display, fields}`)
 plus `paths`. The bundled frontend renderer reads the field map from `.fields`.
+`paths.methods` describes any exposed methods (below).
+
+## Exposed methods
+
+Beyond CRUD, a model can expose its own domain methods — instance **or**
+static/class — as REST endpoints by declaring `static exposedMethods`. This
+avoids hand-writing Express routes for actions like "invite a user to a thread"
+or "search".
+
+```js
+class Thread extends Model {
+  static exposedMethods = [
+    // instance method  ->  POST /api/Thread/:pk/invite   (body: {username, role})
+    {method: 'inviteUser', route: 'invite', verb: 'post',
+     args: {from: 'body', names: ['username', 'role']},
+     description: 'Invite a user to the thread'},
+
+    // instance method  ->  GET  /api/Thread/:pk/participants
+    {method: 'getParticipants', verb: 'get'},
+
+    // params become path segments  ->  DELETE /api/Thread/:pk/users/:username
+    {method: 'removeUser', route: 'users', verb: 'delete',
+     args: {from: 'params', names: ['username']}, permission: 'update'},
+
+    // static method  ->  GET /api/Thread/search?q=...
+    {method: 'search', verb: 'get', args: {from: 'query', names: ['q']},
+     description: 'Search threads by name'},
+  ];
+
+  async inviteUser(username, role) { /* ... */ }
+  async getParticipants() { /* ... */ }
+  async removeUser(username) { /* ... */ }
+  static async search(q) { /* ... */ }
+}
+```
+
+Whether an entry is an **instance** or a **static** method is auto-detected:
+if the name exists on the prototype it mounts under `/:pk` and runs against the
+loaded record (`this`); otherwise it mounts at the model root and runs against
+the class. Force it with `kind: 'instance' | 'static'` if needed.
+
+Config fields:
+
+| Field | Default | Notes |
+|-------|---------|-------|
+| `method` | — (required) | Method name; must exist on the instance or the class. |
+| `route` | the method name | URL segment appended to the model path. |
+| `verb` | `'post'` | HTTP verb. |
+| `args` | none (no-arg) | `{from: 'body' \| 'params' \| 'query', names?: [...]}`. With `names`, arguments are passed **positionally**; without, the whole source object is passed as one argument. `from: 'params'` turns each name into a `/:name` path segment. |
+| `permission` | inferred from `verb` | Token(s) from the permission DSL. Default: `get→read`, `post`/`put`/`patch`→`update`, `delete→delete`. |
+| `description` | `''` | Human-readable summary; surfaced in the OPTIONS `methods` metadata. |
+
+Permission gating reuses `static permissions`: instance methods are checked at
+the **instance** level (so `owner` is evaluated against the loaded record),
+static methods at the **model** level. A `permission` token you haven't declared
+in `static permissions` falls back to `['admin']` (deny-by-default). Handlers
+respond with `{data: <return value>}`; a missing record yields `404`, an
+unauthenticated caller `401`, and a forbidden one `403`.
+
+Exposed methods are discoverable via `OPTIONS /api/:model` under
+`paths.methods`, each entry `{method, route, verb, kind, args, path, permission, description}`.
 
 ## Permissions
 
