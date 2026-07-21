@@ -78,7 +78,7 @@ function packageJson(projectName) {
       simpleworks: 'npx simpleworks',
     },
     dependencies: {
-      '@simpleworkjs/backend': '^0.1.5',
+      '@simpleworkjs/backend': '^0.1.6',
       '@simpleworkjs/conf': '^1.2.0',
       '@simpleworkjs/orm-identity': '^0.1.2',
     },
