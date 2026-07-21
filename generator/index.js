@@ -75,11 +75,12 @@ function packageJson(projectName) {
       start: 'node app.js',
       dev: 'npx nodemon app.js',
       test: 'node --test test/**/*.test.js',
+      simpleworks: 'npx simpleworks',
     },
     dependencies: {
-      '@simpleworkjs/backend': '^0.1.4',
+      '@simpleworkjs/backend': '^0.1.5',
       '@simpleworkjs/conf': '^1.2.0',
-      '@simpleworkjs/orm-identity': '^0.1.1',
+      '@simpleworkjs/orm-identity': '^0.1.2',
     },
     devDependencies: {
       nodemon: '^3.0.2',

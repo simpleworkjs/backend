@@ -1,10 +1,14 @@
 {
   "name": "@simpleworkjs/backend",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Server framework for SimpleWorkJS apps with auto REST API, live sync, RBAC, and a project generator.",
   "main": "index.js",
   "bin": {
     "simpleworks": "cli.js"
+  },
+  "simpleworks": {
+    "namespace": "app",
+    "commands": "./cli/commands.js"
   },
   "scripts": {
     "test": "node --test test/**/*.test.js",
@@ -33,8 +37,8 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "@simpleworkjs/orm-identity": "^0.1.1",
-    "@simpleworkjs/orm": "^0.1.1",
+    "@simpleworkjs/orm-identity": "^0.1.2",
+    "@simpleworkjs/orm": "^0.1.2",
     "cookie-parser": "^1.4.6",
     "ejs": "^3.1.9",
     "ejs-mate": "^4.0.0",
