@@ -112,19 +112,10 @@ module.exports = {
     port: 3000,
   },
 
-  database: {
+  orm: {
     dialect: 'sqlite',
     storage: 'data.sqlite',
     logging: false,
-  },
-
-  redis: {
-    enabled: false,
-    prefix: 'swjs_app:',
-  },
-
-  ldap: {
-    enabled: false,
   },
 
   pubsub: {
