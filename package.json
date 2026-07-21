@@ -4,7 +4,7 @@
   "description": "Server framework for SimpleWorkJS apps with auto REST API, live sync, RBAC, and a project generator.",
   "main": "index.js",
   "bin": {
-    "simpleworks": "./cli.js"
+    "simpleworks": "cli.js"
   },
   "scripts": {
     "test": "node --test test/**/*.test.js",
