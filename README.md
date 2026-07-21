@@ -191,12 +191,45 @@ See [`docs/cli.md`](./docs/cli.md) for the full command context API and advanced
 
 When the app starts, the framework mounts:
 
+- `/api/` — API root; lists every model and its path.
 - `/api/:model` — REST API with `GET`, `POST`, `PUT`, `DELETE`, and `OPTIONS` for schema.
 - `/:model/list`, `/:model/new`, `/:model/edit/:id`, `/:model/:id` — server-rendered pages.
 - `/login`, `/logout` — built-in session authentication.
 - `/custom/*` — custom routes from `routes/` if provided.
 
 The navigation bar is built from loaded models (`navModels`) and links to each model's list page.
+
+### REST responses
+
+| Method | Path | Response |
+|--------|------|----------|
+| `GET` | `/api/:model` | `{results: [...]}` — permission-filtered list |
+| `POST` | `/api/:model` | `{data: {...}}` — created record |
+| `GET` | `/api/:model/:pk` | `{data: {...}}` |
+| `PUT` | `/api/:model/:pk` | `{data: {...}}` — updated record |
+| `DELETE` | `/api/:model/:pk` | `{data: {...}}` — deleted record |
+| `OPTIONS` | `/api/:model` | schema (below) |
+
+Every route is guarded by the model's `static permissions` via
+`@simpleworkjs/orm-identity`'s `requireModelPermission` / `requireInstancePermission`
+middleware. List results are additionally filtered to records the caller may read.
+
+### OPTIONS schema shape
+
+The `OPTIONS` endpoint returns the metadata the frontend uses to build tables and forms:
+
+```js
+{
+  name: 'Task',   // model name
+  pk: 'id',       // primary-key field name
+  display: {...}, // model-level display hints (name, titleField, ...)
+  fields: {...},  // per-field metadata (from Model.toSchema().fields)
+  paths: {...},   // REST paths (from Model.toPaths())
+}
+```
+
+This is exactly `Model.toSchema()` (which returns `{name, pk, display, fields}`)
+plus `paths`. The bundled frontend renderer reads the field map from `.fields`.
 
 ## Permissions
 
@@ -221,7 +254,22 @@ Unauthenticated users are denied unless the action includes the special `'*'` pu
 
 ## PubSub and live sync
 
-By default the framework creates an in-memory pub/sub instance and emits model events over Socket.IO. Provide your own `pubsub` option to replace it (for example, with Redis).
+When a model changes, the framework publishes an event and pushes it to
+connected clients over Socket.IO on the `model:event` channel:
+
+```js
+socket.on('model:event', ({model, action, pk, data}) => { /* ... */ });
+// action is one of: 'create' | 'update' | 'delete'
+```
+
+The bundled [`@simpleworkjs/frontend`](https://github.com/simpleworkjs/frontend)
+client re-publishes each event onto its in-browser bus under
+`model:<Model>:<action>` and `model:any`, which is what drives live table/card
+updates.
+
+By default the framework uses an in-memory pub/sub bus (backed by `p2psub` if
+it is installed, otherwise local-only). Provide your own `pubsub` option to
+replace it — for example, to fan out across processes.
 
 ## Tests
 

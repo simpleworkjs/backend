@@ -11,7 +11,7 @@
     "commands": "./cli/commands.js"
   },
   "scripts": {
-    "test": "node --test test/**/*.test.js",
+    "test": "node --test",
     "dev": "npx nodemon --ignore public/ ./bin/www"
   },
   "keywords": [

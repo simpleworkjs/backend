@@ -64,22 +64,26 @@ router.post('/logout', async function(req, res) {
 });
 
 router.get('/:model/list', async function(req, res, next) {
-  const Model = router.models[req.params.model];
-  if (!Model) return next();
-  if (!Model.hasPermission(req.user, 'read')) {
-    return res.status(req.user ? 403 : 401).render('error', {
-      title: 'Error',
-      message: req.user ? 'Permission denied' : 'Authentication required',
-    });
-  }
+  try {
+    const Model = router.models[req.params.model];
+    if (!Model) return next();
+    if (!Model.hasPermission(req.user, 'read')) {
+      return res.status(req.user ? 403 : 401).render('error', {
+        title: 'Error',
+        message: req.user ? 'Permission denied' : 'Authentication required',
+      });
+    }
 
-  const items = await Model.list();
-  res.render('list', {
-    title: `${Model.toSchema().display.name} list`,
-    modelName: Model.name,
-    schema: Model.toSchema(),
-    items,
-  });
+    const items = await Model.list();
+    res.render('list', {
+      title: `${Model.toSchema().display.name} list`,
+      modelName: Model.name,
+      schema: Model.toSchema(),
+      items,
+    });
+  } catch (error) {
+    next(error);
+  }
 });
 
 router.get('/:model/new', async function(req, res, next) {
@@ -101,49 +105,57 @@ router.get('/:model/new', async function(req, res, next) {
 });
 
 router.get('/:model/:pk/edit', async function(req, res, next) {
-  const Model = router.models[req.params.model];
-  if (!Model) return next();
+  try {
+    const Model = router.models[req.params.model];
+    if (!Model) return next();
 
-  const item = await Model.get(req.params.pk);
-  if (!item) return res.status(404).render('error', {
-    title: 'Error',
-    message: `${Model.name} not found`,
-  });
-  if (!item.hasPermission(req.user, 'update')) {
-    return res.status(req.user ? 403 : 401).render('error', {
-      message: req.user ? 'Permission denied' : 'Authentication required',
+    const item = await Model.get(req.params.pk);
+    if (!item) return res.status(404).render('error', {
+      title: 'Error',
+      message: `${Model.name} not found`,
     });
-  }
+    if (!item.hasPermission(req.user, 'update')) {
+      return res.status(req.user ? 403 : 401).render('error', {
+        message: req.user ? 'Permission denied' : 'Authentication required',
+      });
+    }
 
-  res.render('edit', {
-    title: `Edit ${Model.toSchema().display.name}`,
-    modelName: Model.name,
-    schema: Model.toSchema(),
-    item,
-  });
+    res.render('edit', {
+      title: `Edit ${Model.toSchema().display.name}`,
+      modelName: Model.name,
+      schema: Model.toSchema(),
+      item,
+    });
+  } catch (error) {
+    next(error);
+  }
 });
 
 router.get('/:model/:pk', async function(req, res, next) {
-  const Model = router.models[req.params.model];
-  if (!Model) return next();
+  try {
+    const Model = router.models[req.params.model];
+    if (!Model) return next();
 
-  const item = await Model.get(req.params.pk);
-  if (!item) return res.status(404).render('error', {
-    title: 'Error',
-    message: `${Model.name} not found`,
-  });
-  if (!item.hasPermission(req.user, 'read')) {
-    return res.status(req.user ? 403 : 401).render('error', {
-      message: req.user ? 'Permission denied' : 'Authentication required',
+    const item = await Model.get(req.params.pk);
+    if (!item) return res.status(404).render('error', {
+      title: 'Error',
+      message: `${Model.name} not found`,
     });
-  }
+    if (!item.hasPermission(req.user, 'read')) {
+      return res.status(req.user ? 403 : 401).render('error', {
+        message: req.user ? 'Permission denied' : 'Authentication required',
+      });
+    }
 
-  res.render('detail', {
-    title: `${Model.toSchema().display.name} detail`,
-    modelName: Model.name,
-    schema: Model.toSchema(),
-    item,
-  });
+    res.render('detail', {
+      title: `${Model.toSchema().display.name} detail`,
+      modelName: Model.name,
+      schema: Model.toSchema(),
+      item,
+    });
+  } catch (error) {
+    next(error);
+  }
 });
 
 router.get('/custom/dashboard', async function(req, res) {
