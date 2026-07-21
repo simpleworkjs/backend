@@ -1,0 +1,27 @@
+#!/usr/bin/env node
+'use strict';
+
+/**
+ * Default development entry point for @simpleworkjs/backend.
+ *
+ * Looks for ./app.js in the current working directory (the consumer app),
+ * loads @simpleworkjs/conf from there, and starts the backend.
+ */
+
+const path = require('path');
+
+const appPath = path.join(process.cwd(), 'app.js');
+let app;
+try {
+  app = require(appPath);
+} catch (error) {
+  if (error.code === 'MODULE_NOT_FOUND') {
+    console.error(`Could not find ${appPath}. Run this from a SimpleWorkJS app directory.`);
+    process.exit(1);
+  }
+  throw error;
+}
+
+if (typeof app === 'function') {
+  app();
+}
