@@ -77,7 +77,7 @@ function packageJson(projectName) {
       test: 'node --test test/**/*.test.js',
     },
     dependencies: {
-      '@simpleworkjs/backend': '^0.1.3',
+      '@simpleworkjs/backend': '^0.1.4',
       '@simpleworkjs/conf': '^1.2.0',
       '@simpleworkjs/orm-identity': '^0.1.1',
     },
@@ -97,7 +97,20 @@ const backend = require('@simpleworkjs/backend');
 const conf = require('@simpleworkjs/conf');
 const models = require('./models');
 
-const app = backend({conf, models});
+async function seed(models) {
+  const users = await models.User.list({where: {userName: 'admin'}});
+  if (users.length) return;
+
+  await models.User.create({
+    userName: 'admin',
+    email: 'admin@example.com',
+    password: 'Changeme1!',
+    isAdmin: true,
+    isValid: true,
+  });
+}
+
+const app = backend({conf, models, seed});
 
 app.start();
 `;
