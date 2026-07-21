@@ -73,11 +73,11 @@ function packageJson(projectName) {
     main: 'app.js',
     scripts: {
       start: 'node app.js',
-      dev: 'nodemon app.js',
+      dev: 'npx nodemon app.js',
       test: 'node --test test/**/*.test.js',
     },
     dependencies: {
-      '@simpleworkjs/backend': '^0.1.1',
+      '@simpleworkjs/backend': '^0.1.2',
       '@simpleworkjs/conf': '^1.2.0',
       '@simpleworkjs/orm-identity': '^0.1.1',
     },
@@ -146,7 +146,7 @@ module.exports = {
     port: 3000,
   },
 
-  database: {
+  orm: {
     storage: 'data-dev.sqlite',
     logging: false,
   },
