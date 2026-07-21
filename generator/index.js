@@ -77,9 +77,9 @@ function packageJson(projectName) {
       test: 'node --test test/**/*.test.js',
     },
     dependencies: {
-      '@simpleworkjs/backend': '^0.1.0',
+      '@simpleworkjs/backend': '^0.1.1',
       '@simpleworkjs/conf': '^1.2.0',
-      '@simpleworkjs/orm-identity': '^0.1.0',
+      '@simpleworkjs/orm-identity': '^0.1.1',
     },
     devDependencies: {
       nodemon: '^3.0.2',
