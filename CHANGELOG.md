@@ -1,6 +1,14 @@
 # Changelog
 
-## Unreleased
+## 0.2.0
+
+### Changed
+
+- **Bumped the `@simpleworkjs/orm`, `@simpleworkjs/orm-identity`, and
+  `@simpleworkjs/frontend` ranges to `^0.2.0`** to pull in their dependency
+  security updates (`bcrypt` 6, `sqlite3` 6, `uuid` 11). Added an `overrides`
+  entry pinning `uuid` to `^11.1.1`. Consumers on `^0.1.x` should bump to
+  `^0.2.0`.
 
 ### Fixed
 
