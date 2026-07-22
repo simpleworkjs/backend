@@ -1,0 +1,82 @@
+<% layout('layout') -%>
+<%
+  // Bootstrap contextual color per HTTP method (Swagger-style).
+  const methodColor = {
+    GET: 'success', POST: 'primary', PUT: 'warning',
+    PATCH: 'warning', DELETE: 'danger', OPTIONS: 'secondary',
+  };
+  function permBadges(tokens) {
+    if (!tokens || !tokens.length) return '<span class="text-muted">—</span>';
+    return tokens.map(function(t){ return '<span class="badge text-bg-light border">' + t + '</span>'; }).join(' ');
+  }
+%>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h1 class="h3 mb-1">API Reference</h1>
+    <p class="text-muted mb-0">Auto-generated from your models. Base URL <code><%= prefix %></code>. All responses are JSON.</p>
+  </div>
+  <span class="badge text-bg-secondary align-self-start"><%= models.length %> collections</span>
+</div>
+
+<div class="accordion sw-apidocs" id="apidocs">
+  <% models.forEach(function(model, i){ %>
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button <%= i === 0 ? '' : 'collapsed' %>" type="button"
+                data-bs-toggle="collapse" data-bs-target="#m-<%= model.name %>">
+          <span class="fw-semibold me-2"><%= model.display.name || model.name %></span>
+          <code class="small text-muted"><%= prefix %>/<%= model.name %></code>
+        </button>
+      </h2>
+      <div id="m-<%= model.name %>" class="accordion-collapse collapse <%= i === 0 ? 'show' : '' %>" data-bs-parent="#apidocs">
+        <div class="accordion-body">
+
+          <h6 class="text-uppercase text-muted small">Endpoints</h6>
+          <div class="table-responsive mb-4">
+            <table class="table table-sm align-middle sw-endpoints">
+              <thead><tr><th style="width:6rem">Method</th><th>Path</th><th>Description</th><th style="width:12rem">Requires</th></tr></thead>
+              <tbody>
+                <% model.base.concat(model.methods).forEach(function(e){ %>
+                  <tr>
+                    <td><span class="badge text-bg-<%= methodColor[e.method] || 'secondary' %> sw-method"><%= e.method %></span></td>
+                    <td><code><%= e.path %></code><% if (e.kind) { %> <span class="badge text-bg-light border small"><%= e.kind %></span><% } %></td>
+                    <td class="small"><%= e.description %></td>
+                    <td><%- permBadges(e.permission) %></td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+
+          <h6 class="text-uppercase text-muted small">Schema</h6>
+          <div class="table-responsive">
+            <table class="table table-sm sw-schema">
+              <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Notes</th></tr></thead>
+              <tbody>
+                <% Object.values(model.fields).forEach(function(f){ %>
+                  <tr>
+                    <td><code><%= f.name %></code><% if (f.name === model.pk) { %> <span class="badge text-bg-info">pk</span><% } %></td>
+                    <td class="small"><%= f.type %><% if (f.references) { %> → <a href="/api-docs#m-<%= f.references.model %>"><%= f.references.model %></a><% } %></td>
+                    <td><% if (!f.allowNull) { %><span class="badge text-bg-warning">required</span><% } else { %><span class="text-muted">no</span><% } %></td>
+                    <td class="small text-muted">
+                      <% if (f.isPrivate) { %><span class="badge text-bg-secondary">private</span> <% } %>
+                      <% if (f.writeOnly) { %><span class="badge text-bg-secondary">write-only</span> <% } %>
+                      <% if (f.unique) { %><span class="badge text-bg-secondary">unique</span> <% } %>
+                      <% if (f.references) { %><%= f.references.type %> (fk <code><%= f.foreignKey %></code>)<% } %>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  <% }) %>
+</div>
+
+<p class="text-muted small mt-3">
+  Tip: call <code>OPTIONS <%= prefix %>/:model</code> to get this schema as JSON, or <code>GET <%= prefix %>/</code> to list collections.
+</p>

@@ -38,6 +38,56 @@ router.get('/', async function(req, res) {
   });
 });
 
+// Auto-generated, Swagger-style API documentation for every loaded model,
+// built from each model's `toSchema()` + `toPaths()`. Gated to logged-in users
+// since it exposes the full API surface and permission requirements.
+router.get('/api-docs', async function(req, res) {
+  if (!req.user) return res.redirect('/login');
+
+  const prefix = '/api';
+  const verbAction = {get: 'read', post: 'create', put: 'update', patch: 'update', delete: 'delete'};
+
+  const models = Object.values(router.models).map(function(Model) {
+    const schema = Model.toSchema();
+    const paths = Model.toPaths();
+    const perms = schema.permissions || {};
+
+    // CRUD endpoints, tagged with the permission action they require.
+    const base = (paths.base || []).map(function(e) {
+      return {
+        method: e.method.toUpperCase(),
+        path: prefix + e.path,
+        description: e.description,
+        permission: perms[verbAction[e.method]] || [],
+      };
+    });
+
+    // Custom exposed methods (instance/static), each with its own permission.
+    const methods = (paths.methods || []).map(function(m) {
+      return {
+        method: m.verb.toUpperCase(),
+        path: prefix + m.path,
+        description: m.description || (m.kind + ' method ' + m.method),
+        permission: Array.isArray(m.permission) ? m.permission : [m.permission],
+        kind: m.kind,
+        args: m.args,
+      };
+    });
+
+    return {
+      name: Model.name,
+      display: schema.display,
+      pk: schema.pk,
+      fields: schema.fields,
+      permissions: perms,
+      base: base,
+      methods: methods,
+    };
+  });
+
+  res.render('apidocs', {title: 'API Docs', models: models, prefix: prefix});
+});
+
 router.get('/login', async function(req, res) {
   res.render('login', {
     title: 'Login',

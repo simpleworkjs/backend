@@ -60,3 +60,19 @@ main {
 :target {
   scroll-margin-top: 5rem;
 }
+
+/* API docs (Swagger-style) */
+.sw-apidocs .sw-method {
+  min-width: 4.25rem;
+  font-family: var(--bs-font-monospace);
+  letter-spacing: 0.02em;
+}
+
+.sw-apidocs .sw-endpoints code,
+.sw-apidocs .sw-schema code {
+  color: var(--bs-body-color);
+}
+
+.sw-apidocs .accordion-button code {
+  font-size: 0.8rem;
+}

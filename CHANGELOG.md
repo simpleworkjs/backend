@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.3
+
+### Added
+
+- **Auto-generated API reference page at `/api-docs`** (Swagger-style). Built
+  from every model's `toSchema()` + `toPaths()`: a per-collection accordion
+  listing the CRUD endpoints and any exposed methods (with HTTP-method badges,
+  descriptions, and the required permission per endpoint) plus the field schema.
+  Gated to logged-in users. New `views/apidocs.ejs` + route in `routes/pages.js`;
+  added an **API** link to the nav.
+
 ## 0.2.2
 
 ### Added

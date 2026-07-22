@@ -194,10 +194,20 @@ When the app starts, the framework mounts:
 - `/api/` — API root; lists every model and its path.
 - `/api/:model` — REST API with `GET`, `POST`, `PUT`, `DELETE`, and `OPTIONS` for schema.
 - `/:model/list`, `/:model/new`, `/:model/edit/:id`, `/:model/:id` — server-rendered pages.
+- `/api-docs` — auto-generated, Swagger-style API reference (endpoints, permissions, schema) for every model. Requires login.
 - `/login`, `/logout` — built-in session authentication.
 - `/custom/*` — custom routes from `routes/` if provided.
 
 The navigation bar is built from loaded models (`navModels`) and links to each model's list page.
+
+### Built-in views
+
+The generated pages render from EJS templates bundled in this package's
+**`views/`** folder (`layout.ejs`, `index.ejs` — the home page —, `list.ejs`,
+`edit.ejs`, `detail.ejs`, `apidocs.ejs`, `custom.ejs`, `login.ejs`, `error.ejs`).
+Apps use these by default. To override them, set `conf.views.path` to your own
+directory (which must then supply the full set) — otherwise the framework falls
+back to the bundled `views/`.
 
 ### REST responses
 

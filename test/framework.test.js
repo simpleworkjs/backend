@@ -213,6 +213,33 @@ test('OPTIONS includes the model permissions map and page size', async function(
   }
 });
 
+test('GET /api-docs renders the auto-generated API reference for a logged-in user', async function() {
+  class Widget extends Model {
+    static fields = {id: {type: 'uuid', primaryKey: true}, label: {type: 'string', isRequired: true}};
+    static permissions = {read: ['user']};
+  }
+  const app = backend({conf: makeConf(), models: [Widget]});
+  const models = await app.init();
+  const port = await listen(app.http);
+  const base = `http://localhost:${port}`;
+  try {
+    // Unauthenticated → redirected to login.
+    const anon = await fetch(`${base}/api-docs`, {redirect: 'manual'});
+    assert.strictEqual(anon.status, 302);
+
+    const user = await models.User.create({userName: 'docs', email: 'd@e.com', password: 'Wonderland1!'});
+    const token = await auth.issueAuthToken(user, models, 'test');
+    const res = await fetch(`${base}/api-docs`, {headers: {Authorization: `Bearer ${token.token}`}});
+    assert.strictEqual(res.status, 200);
+    const html = await res.text();
+    assert.ok(html.includes('API Reference'), 'renders the docs page');
+    assert.ok(html.includes('Widget'), 'lists the model');
+    assert.ok(html.includes('/api/Widget'), 'shows the endpoint path');
+  } finally {
+    await app.close();
+  }
+});
+
 test('GET /api/:model paginates with page/pageSize and returns the envelope', async function() {
   class Item extends Model {
     static fields = {id: {type: 'uuid', primaryKey: true}, n: {type: 'int'}};
