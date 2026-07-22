@@ -203,7 +203,7 @@ The navigation bar is built from loaded models (`navModels`) and links to each m
 
 | Method | Path | Response |
 |--------|------|----------|
-| `GET` | `/api/:model` | `{results: [...]}` — permission-filtered list |
+| `GET` | `/api/:model` | `{results, page, pageSize, total, pageCount}` — paginated, permission-filtered list |
 | `POST` | `/api/:model` | `{data: {...}}` — created record |
 | `GET` | `/api/:model/:pk` | `{data: {...}}` |
 | `PUT` | `/api/:model/:pk` | `{data: {...}}` — updated record |
@@ -214,17 +214,39 @@ Every route is guarded by the model's `static permissions` via
 `@simpleworkjs/orm-identity`'s `requireModelPermission` / `requireInstancePermission`
 middleware. List results are additionally filtered to records the caller may read.
 
+### Pagination
+
+`GET /api/:model` accepts `?page` (1-based) and `?pageSize` and returns the
+envelope `{results, page, pageSize, total, pageCount}`. `pageSize` defaults to
+the model's `static pageSize` (or **20**) and is capped at 500:
+
+```js
+class Task extends Model {
+  static pageSize = 50;   // rows per page for the list endpoint + generated UI
+  static fields = {/* ... */};
+}
+```
+
+```bash
+GET /api/Task?page=2&pageSize=25
+```
+
+(For owner-scoped models the per-row read filter still applies to each page, so
+`total` counts all rows and a page may come back partially filtered — an
+accepted approximation; all-readable models are exact.)
+
 ### OPTIONS schema shape
 
 The `OPTIONS` endpoint returns the metadata the frontend uses to build tables and forms:
 
 ```js
 {
-  name: 'Task',   // model name
-  pk: 'id',       // primary-key field name
-  display: {...}, // model-level display hints (name, titleField, ...)
-  fields: {...},  // per-field metadata (from Model.toSchema().fields)
-  paths: {...},   // REST paths (from Model.toPaths())
+  name: 'Task',        // model name
+  pk: 'id',            // primary-key field name
+  display: {...},      // model-level display hints (name, titleField, pageSize, ...)
+  fields: {...},       // per-field metadata (from Model.toSchema().fields)
+  permissions: {...},  // required token(s) per action {read, create, update, delete}
+  paths: {...},        // REST paths (from Model.toPaths())
 }
 ```
 

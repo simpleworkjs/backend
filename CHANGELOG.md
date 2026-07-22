@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.2.2
+
+### Added
+
+- **Paginated list endpoint.** `GET /api/:model` accepts `?page` (1-based) and
+  `?pageSize` (defaults to the model's `static pageSize`, else 20) and returns
+  `{results, page, pageSize, total, pageCount}`. Still applies the per-row read
+  permission filter (`lib/modelRoute.js`).
+- **UI overhaul** (`views/layout.ejs`, `views/list.ejs`, `routes/pages.js`,
+  `public/css/style.css`): sticky top nav with the menu on the right and a
+  profile dropdown (Profile, Tokens, admin-only links to the identity
+  collections, Log out) built from `res.locals.user` / `res.locals.isAdmin`;
+  Bootstrap Icons; identity models moved out of the main nav into the profile
+  Admin menu. `list.ejs` now renders the single collection-card view.
+
+### Fixed
+
+- **`layout.ejs` never loaded `app.messages.js`**, so the frontend's toasts and
+  confirm dialogs (used by delete, form save, etc.) threw `app.messages is
+  undefined`. Added the script.
+
 ## 0.2.1
 
 ### Added

@@ -19,6 +19,15 @@ router.use(async function(req, res, next) {
   }
 });
 
+// Expose the authenticated user to every rendered page (the layout's profile
+// dropdown and admin menu read these). authMiddleware above populates req.user
+// and req.permissions.
+router.use(function(req, res, next) {
+  res.locals.user = req.user || null;
+  res.locals.isAdmin = !!(req.permissions && req.permissions.has('admin'));
+  next();
+});
+
 router.get('/', async function(req, res) {
   res.render('index', {
     title: 'SimpleWorkJS',

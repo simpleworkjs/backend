@@ -30,3 +30,33 @@ main {
 .toast-container {
   z-index: 1080;
 }
+
+/* Sticky top nav */
+.navbar.sticky-top {
+  z-index: 1030;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+
+/* Collection card (default list view) */
+.sw-collection .card-header h5 {
+  font-weight: 600;
+}
+
+.sw-collection-table {
+  font-size: 0.95rem;
+}
+
+.sw-collection-table th {
+  white-space: nowrap;
+  border-top: 0;
+}
+
+.sw-collection .card-footer {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+/* Give scrolled-to content clearance under the sticky nav */
+:target {
+  scroll-margin-top: 5rem;
+}

@@ -199,6 +199,55 @@ test('OPTIONS schema route returns the field map under `fields` (app.render cont
   }
 });
 
+test('OPTIONS includes the model permissions map and page size', async function() {
+  const {app, base, aliceToken, authHeaders} = await setupOwnershipApp();
+  try {
+    const res = await fetch(`${base}/api/Note`, {method: 'OPTIONS', headers: authHeaders(aliceToken)});
+    const body = await res.json();
+    assert.ok(body.permissions, 'permissions present');
+    assert.deepStrictEqual(body.permissions.read, ['user', 'owner']);
+    assert.deepStrictEqual(body.permissions.create, ['user']);
+    assert.strictEqual(typeof body.display.pageSize, 'number', 'pageSize default present');
+  } finally {
+    await app.close();
+  }
+});
+
+test('GET /api/:model paginates with page/pageSize and returns the envelope', async function() {
+  class Item extends Model {
+    static fields = {id: {type: 'uuid', primaryKey: true}, n: {type: 'int'}};
+    static permissions = {read: ['user'], create: ['user']};
+    static pageSize = 10;
+  }
+  const app = backend({conf: makeConf(), models: [Item]});
+  const models = await app.init();
+  const port = await listen(app.http);
+  const base = `http://localhost:${port}`;
+  try {
+    const user = await models.User.create({userName: 'pager', email: 'p@e.com', password: 'Wonderland1!'});
+    const token = await auth.issueAuthToken(user, models, 'test');
+    const headers = {Authorization: `Bearer ${token.token}`};
+    for (let i = 0; i < 25; i++) await models.Item.create({n: i});
+
+    const r1 = await (await fetch(`${base}/api/Item?page=1`, {headers})).json();
+    assert.strictEqual(r1.total, 25);
+    assert.strictEqual(r1.pageSize, 10, 'uses the model default pageSize');
+    assert.strictEqual(r1.pageCount, 3);
+    assert.strictEqual(r1.page, 1);
+    assert.strictEqual(r1.results.length, 10);
+
+    const r3 = await (await fetch(`${base}/api/Item?page=3`, {headers})).json();
+    assert.strictEqual(r3.results.length, 5, 'last page has the remainder');
+
+    const rOverride = await (await fetch(`${base}/api/Item?page=1&pageSize=20`, {headers})).json();
+    assert.strictEqual(rOverride.pageSize, 20);
+    assert.strictEqual(rOverride.pageCount, 2);
+    assert.strictEqual(rOverride.results.length, 20);
+  } finally {
+    await app.close();
+  }
+});
+
 test('WebSocket model events are only broadcast to sockets whose user may read that row', async function() {
   const {app, base, alice, bob, aliceToken, bobToken, authHeaders} = await setupOwnershipApp();
   app.attachSockets();
