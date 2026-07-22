@@ -213,6 +213,46 @@ test('OPTIONS includes the model permissions map and page size', async function(
   }
 });
 
+test('access editor: GET returns grants; PUT is admin-only and changes enforcement', async function() {
+  class Widget extends Model {
+    static fields = {id: {type: 'uuid', primaryKey: true}, name: {type: 'string'}, createdBy: {type: 'hasOne', model: 'User'}};
+    static permissions = {read: ['user'], create: ['user'], update: ['owner'], delete: ['owner']};
+  }
+  const app = backend({conf: makeConf(), models: [Widget]});
+  const models = await app.init();
+  const port = await listen(app.http);
+  const base = `http://localhost:${port}`;
+  try {
+    const admin = await models.User.create({userName: 'adm', email: 'a@e.com', password: 'Wonderland1!', isAdmin: true});
+    const plain = await models.User.create({userName: 'usr', email: 'u@e.com', password: 'Wonderland1!'});
+    const adminTok = await auth.issueAuthToken(admin, models, 't');
+    const userTok = await auth.issueAuthToken(plain, models, 't');
+    const H = t => ({Authorization: `Bearer ${t.token}`, 'Content-Type': 'application/json'});
+
+    const g = await (await fetch(`${base}/api/_access/Widget`, {headers: H(userTok)})).json();
+    assert.strictEqual(g.access.everyone.read, true, 'seeded everyone.read');
+    assert.strictEqual(g.access.owner.update, true, 'seeded owner.update');
+
+    const forbidden = await fetch(`${base}/api/_access/Widget`, {
+      method: 'PUT', headers: H(userTok), body: JSON.stringify({everyone: {read: false}}),
+    });
+    assert.strictEqual(forbidden.status, 403, 'non-admin cannot edit access');
+
+    // Admin turns everyone.read off (owner keeps read/update).
+    const put = await fetch(`${base}/api/_access/Widget`, {
+      method: 'PUT', headers: H(adminTok),
+      body: JSON.stringify({owner: {read: true, update: true, create: false, delete: false}, group: {}, everyone: {}}),
+    });
+    assert.strictEqual(put.status, 200);
+
+    // A plain user's list read is now denied (everyone.read is off).
+    const listResp = await fetch(`${base}/api/Widget`, {headers: H(userTok)});
+    assert.strictEqual(listResp.status, 403, 'plain user denied read after everyone.read off');
+  } finally {
+    await app.close();
+  }
+});
+
 test('GET /api-docs renders the auto-generated API reference for a logged-in user', async function() {
   class Widget extends Model {
     static fields = {id: {type: 'uuid', primaryKey: true}, label: {type: 'string', isRequired: true}};

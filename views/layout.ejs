@@ -19,6 +19,11 @@
   <script src="/lib/js/app.modal.js"></script>
   <script src="/lib/js/app.render.js"></script>
   <script src="/lib/js/app.custom.js"></script>
+  <script>
+    // Current user for the client (permission editor, future permission-aware UI).
+    window.app = window.app || {};
+    app.currentUser = <%- user ? JSON.stringify({id: user.id, userName: user.userName, isAdmin: isAdmin}) : 'null' %>;
+  </script>
 </head>
 <body>
   <%

@@ -343,7 +343,24 @@ Special values:
 - `'user'` — any authenticated user.
 - `'owner'` — the user who created the record (`createdById` match).
 
-Unauthenticated users are denied unless the action includes the special `'*'` public flag.
+`static permissions` is the **default** now: on boot the framework seeds a
+DB-backed access rule per model (translating those tokens into tiered grants),
+and every access decision is made against that runtime policy.
+
+### Runtime, editable access rules
+
+Access is stored on **Roles** as `{owner, group, everyone} × {create, read,
+update, delete}` grants (`entityModel` + `entityPermissions`), evaluated per
+record: a caller gets the `owner` tier for records they created, otherwise the
+`everyone` tier (grants cascade — an owner also gets `everyone` grants); admins
+bypass. Rules are editable at runtime:
+
+- `GET /api/_access/:model` — the model's current grants (any signed-in user).
+- `PUT /api/_access/:model` — replace them (admin only); takes effect immediately.
+
+The generated collection UI exposes this as an editable grid in the
+**Permissions** modal. Seeded defaults preserve each model's original
+`static permissions` behaviour until an admin changes them.
 
 ## PubSub and live sync
 

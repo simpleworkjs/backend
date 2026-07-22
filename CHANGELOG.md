@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.2.4
+
+### Added
+
+- **Access editor endpoint** `GET/PUT /api/:prefix/_access/:model`
+  (`lib/modelRoute.js`): GET returns a model's tiered access grants; PUT
+  (admin-only) writes the model's governing Role and rebuilds the policy so the
+  change takes effect on the next request. The framework installs the runtime
+  access policy on boot (`lib/framework.js` → `auth.installAccessPolicy`), and
+  the WebSocket broadcast now scopes via the same `Model.canAccess` check as the
+  REST layer. The layout exposes the current user to the client
+  (`window.app.currentUser`) for the permission editor.
+
 ## 0.2.3
 
 ### Added
