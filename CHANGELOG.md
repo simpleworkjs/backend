@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.5
+
+### Changed
+
+- Raised the `@simpleworkjs/*` dependency floors from `^0.2.0` to the releases
+  carrying the DB-backed permission stack: `orm ^0.2.5` (json field + runtime
+  access policy), `orm-identity ^0.2.2` (entity-rule Roles), `frontend ^0.2.3`
+  (editable permissions grid). Ensures a fresh `npm install` of the backend pulls
+  a coherent set where the access-editor endpoints and UI have their server- and
+  client-side support present. No backend code changes.
+
 ## 0.2.4
 
 ### Added
