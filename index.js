@@ -33,6 +33,13 @@ function backend(options) {
 backend.framework = createSimpleWorkJS;
 backend.modelRoute = modelRoute;
 backend.PubSub = pubsub.PubSub;
+
+// Notification history + feed (lib/activity.js). Wired automatically by
+// createSimpleWorkJS; exported for apps that mount their own routes.
+const activity = require('./lib/activity');
+backend.activity = activity;
+backend.ActivityEvent = activity.ActivityEvent;
+backend.ActivitySeen = activity.ActivitySeen;
 backend.render = render;
 backend.pages = pages;
 backend.generator = generator;
