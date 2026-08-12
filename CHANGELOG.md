@@ -1,5 +1,34 @@
 # Changelog
 
+## 0.3.0
+
+### Added
+
+- **Notifications, baked in.** An app built on this framework now gets a
+  notification feed with no code of its own. The idea is that there was nothing
+  to build: a notification system's hard problem is "who should see this", and
+  the socket bridge already answers it — `Model.canAccess(user, 'read', record)`,
+  per socket, per event. So a notification is an event that passed that check,
+  and history is the same events replayed through the same check. No recipient
+  resolution, no fan-out table.
+  - `ActivityEvent` / `ActivitySeen` are registered automatically, and
+    `GET <prefix>/activity` + `PUT <prefix>/activity/seen` are mounted alongside
+    the model routes. Pair with `app.notify` from `@simpleworkjs/frontend`.
+  - Events are recorded in the socket bridge — once per event, before the
+    per-socket fan-out — so nothing has to remember to log. Best-effort and
+    unawaited: a model write must never fail, or wait, because its history row
+    did not save.
+  - **Shape only**: model, action, pk, actor, owner, timestamp. Deliberately no
+    payload, so history never becomes a second copy of the data, retaining a
+    deleted record's contents after it is gone. `owner` is kept so an owner-tier
+    read can still be judged once the record itself is gone.
+  - Unread is one watermark per user rather than a read flag per item, so
+    opening the feed on one device clears the badge on all of them.
+  - `ActivityEvent`'s own writes are never recorded — otherwise recording an
+    event creates a row whose write is an event, which records again, forever.
+    Both models keep every write action admin-only, so the generated REST routes
+    cannot be used to forge history.
+
 ## 0.2.5
 
 ### Changed
