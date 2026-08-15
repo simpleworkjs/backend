@@ -37,7 +37,7 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "@simpleworkjs/frontend": "^0.2.3",
+    "@simpleworkjs/frontend": "^0.4.2",
     "@simpleworkjs/orm": "^0.2.5",
     "@simpleworkjs/orm-identity": "^0.2.2",
     "cookie-parser": "^1.4.6",
